@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://omaju-mariadb:3306/coredb
+    username: ${MARIADB_USERNAME}
+    password: ${MARIADB_PASSWORD}
+
+  data:
+    redis:
+      host: omaju-redisdb
+      port: 6379
+      password: ${REDISDB_PASSWORD}

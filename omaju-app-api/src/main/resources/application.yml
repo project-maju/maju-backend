@@ -1,1 +1,46 @@
-spring.application.name=omaju
+server:
+  port: 8080
+
+  servlet:
+    context-path: /api/v1
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+spring:
+  profiles:
+    active: local
+
+  jwt:
+    key: service-key
+    live:
+      atk : 1800000 # 30분
+      rtk : 1209600000  #2주
+  jpa:
+    open-in-view: false # Lazy loading을 사용하기 위해 Session을 Controller까지 유지하는 옵션
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true #To beautify or pretty print the SQL
+        type:
+          preferred_uuid_jdbc_type: CHAR # UUID 타입을 CHAR 타입으로 매핑
+        show_sql: true #show sql
+    # 애플리케이션 실행 시점에서 데이터베이스 연결이 아직 준비되지 않았더라도 예외가 발생 안함. 어플리케이션 안전성과 신뢰성 높임
+    defer-datasource-initialization: true
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  sql:
+    init:
+      mode: always
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+logging:
+  log4j2:
+    config: log4j2.yml

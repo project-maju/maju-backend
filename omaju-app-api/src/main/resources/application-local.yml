@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://localhost:3306/coredb
+    username: omaju
+    password: serim0503!
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: serim0503!

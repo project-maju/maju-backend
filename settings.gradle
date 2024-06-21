@@ -1,0 +1,4 @@
+rootProject.name = 'omaju'
+include 'omaju-app-api'
+include 'omaju-app-batch'
+include 'omaju-core'

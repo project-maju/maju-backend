@@ -34,6 +34,7 @@ jobs:
     # 3. Docker 이미지 빌드
     - name: docker image build
       run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/github-actions-demo .
+      working-directory: ./omaju-app-api
 
     # 4. DockerHub 로그인
     - name: dockerhub login
@@ -45,3 +46,4 @@ jobs:
     # 5. Dockerhub 이미지 푸시
     - name: dockerhub push
       run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/omaju-app-api:latest
+      working-directory: ./omaju-app-api

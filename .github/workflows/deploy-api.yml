@@ -1,0 +1,29 @@
+name: deploy-api
+
+on:
+  push:
+    branches: [ "deploy-api" ]
+  pull_request:
+    branches: [ "deploy-api" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    # 1. Java 17 세팅
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    # 2. Spring Boot 애플리케이션 빌드 (Gradle)
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
+
+    - name: Build with Gradle Wrapper
+      run: ./gradlew omaju-app-api:build

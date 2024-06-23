@@ -37,9 +37,9 @@ jobs:
       uses: crazy-max/ghaction-docker-meta@v1
       with:
         images: ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKER_IMAGE_API }}
-        tag-custom: |
+        tag-semver: |
           latest
-          ${{ github.run_number }}
+          ${{ env.RELEASE_VERSION }}
 
     # 4. DockerHub 로그인
     - name: Dockerhub login
@@ -62,8 +62,7 @@ jobs:
           linux/arm64/v8
         push: true
         tags: ${{ steps.docker_meta.outputs.tags }}
-        label: |
-          ${{ steps.docker_meta.outputs.labels }}
+        label: ${{ steps.docker_meta.outputs.labels }}
 
   deploy:
     needs: build

@@ -60,7 +60,7 @@ jobs:
       uses: docker/build-push-action@v4
       with:
         context: ./omaju-app-api # Dockerfile 기반으로 이미지를 빌드 할 프로젝트 경로
-        file: ./Dockerfile
+        file: Dockerfile
         platforms: |
           linux/amd64
           linux/arm64

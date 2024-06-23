@@ -34,9 +34,12 @@ jobs:
     # 3. docker Image 메타데이터 생성 및 관리
     - name: Docker Meta
       id: docker_meta
-      uses: docker/metadata-action@v5
+      uses: crazy-max/ghaction-docker-meta@v1
       with:
         images: ${{ secrets.DOCKER_IMAGE_API }}
+        tag-semver: |
+          latest
+          ${{ github.run_id }}.${{ github.run_number }}.${{ github.run_attempt }}
     
     # 4. 멀티 플랫폼 대응을 위한 buildx 설정
     - name: Set up Docker Buildx
@@ -58,9 +61,7 @@ jobs:
           linux/amd64
           linux/arm64/v8
         push: true
-        tags: |
-          ${{ secrets.DOCKER_IMAGE_API }}:latest
-          ${{ secrets.DOCKER_IMAGE_API }}:${{ github.run_id }}.${{ github.run_number }}.${{ github.run_attempt }}
+        tags: ${ steps.docker_meta.outputs.tags }
         label: ${{ steps.docker_meta.outputs.labels }}
 
   deploy:

@@ -37,7 +37,9 @@ jobs:
       uses: crazy-max/ghaction-docker-meta@v1
       with:
         images: ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKER_IMAGE_API }}
-        tag-custom: latest, ${{ github.run_number }}
+        tag-custom: |
+          latest
+          ${{ github.run_number }}
 
     # 4. DockerHub 로그인
     - name: Dockerhub login
@@ -77,6 +79,6 @@ jobs:
           key: ${{ secrets.SERVER_KEY }} # ssh pem키 => BEGIN RSA ~ END RSA
           script: |
             sudo docker rm -f ${{ secrets.DOCKER_CONTAINER_API }}
-            sudo docker pull ${{ secrets.DOCKER_IMAGE_API }}:latest
+            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKER_IMAGE_API }}:latest
             sudo docker image prune -f
             sudo docker run --name ${{ secrets.DOCKER_CONTAINER_API }} -p 8000:8080 -d ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKER_IMAGE_API }}:latest

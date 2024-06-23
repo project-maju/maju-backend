@@ -34,7 +34,7 @@ jobs:
     # 3. docker Image 메타데이터 생성 및 관리
     - name: Docker Meta
       id: docker_meta
-      uses: crazy-max/ghaction-docker-meta@v1
+      uses: docker/metadata-action@v5
       with:
         images: ${{ secrets.DOCKER_IMAGE_API }}
     
@@ -60,7 +60,7 @@ jobs:
         push: true
         tags: |
           ${{ secrets.DOCKER_IMAGE_API }}:latest
-          ${{ secrets.DOCKER_IMAGE_API }}:${{ github.run_number }}
+          ${{ secrets.DOCKER_IMAGE_API }}:${{ github.run_id }}.${{ github.run_number }}.${{ github.run_attempt }}
         label: ${{ steps.docker_meta.outputs.labels }}
 
   deploy:

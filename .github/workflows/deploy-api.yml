@@ -37,7 +37,6 @@ jobs:
       uses: crazy-max/ghaction-docker-meta@v1
       with:
         images: ${{ secrets.DOCKER_IMAGE_API }}
-        tag-custom: latest, ${{ github.run_number }}
     
     # 4. 멀티 플랫폼 대응을 위한 buildx 설정
     - name: Set up Docker Buildx
@@ -59,14 +58,16 @@ jobs:
           linux/amd64
           linux/arm64/v8
         push: true
-        tags: ${{ steps.docker_meta.outputs.tags }}
+        tags: |
+          ${{ secrets.DOCKER_IMAGE_API }}:latest
+          ${{ secrets.DOCKER_IMAGE_API }}:${{ github.run_number }}
         label: ${{ steps.docker_meta.outputs.labels }}
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       # 7. 서버 SSH 접속 후 docker 컨테이너 배포
       - name: ssh deploy
         uses: appleboy/ssh-action@v0.1.6

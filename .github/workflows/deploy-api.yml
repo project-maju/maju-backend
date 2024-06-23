@@ -37,22 +37,22 @@ jobs:
       uses: crazy-max/ghaction-docker-meta@v1
       with:
         images: ${{ secrets.DOCKER_IMAGE_API }}
-        tag-custom: latest, ${{ env.RELEASE_VERSION }}
+        tag-custom: latest, ${{ github.run_number }}
+    
+    # 4. 멀티 플랫폼 대응을 위한 buildx 설정
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
 
-    # 4. DockerHub 로그인
+    # 5. DockerHub 로그인
     - name: Dockerhub login
       uses: docker/login-action@v3
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-    # 5. 멀티 플랫폼 대응을 위한 buildx 설정
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
-
     # 6. Docker 이미지 빌드 및 Dockerhub 이미지 푸시
     - name: Docker Build and Dockerhub Push
-      uses: docker/build-push-action@v4
+      uses: docker/build-push-action@v2
       with:
         context: ./omaju-app-api
         platforms: |
@@ -66,7 +66,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
       # 7. 서버 SSH 접속 후 docker 컨테이너 배포
       - name: ssh deploy
         uses: appleboy/ssh-action@v0.1.6

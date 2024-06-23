@@ -51,7 +51,11 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-    # 5. Docker 이미지 빌드 및 Dockerhub 이미지 푸시
+    # 5. 멀티 플랫폼 대응을 위한 buildx 설정
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    # 6. Docker 이미지 빌드 및 Dockerhub 이미지 푸시
     - name: Docker Build and Dockerhub Push
       uses: docker/build-push-action@v4
       with:
@@ -62,6 +66,7 @@ jobs:
           linux/arm64
           linux/armhf
           linux/arm/v7
+          linux/arm/v8
           linux/s390x
         push: true
         tags: ${{ steps.docker_meta.outputs.tags }}
@@ -73,7 +78,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      # 6. 서버 SSH 접속 후 docker 컨테이너 배포
+      # 7. 서버 SSH 접속 후 docker 컨테이너 배포
       - name: ssh deploy
         uses: appleboy/ssh-action@v0.1.6
         with:

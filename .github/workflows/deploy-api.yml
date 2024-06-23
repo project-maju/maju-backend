@@ -31,11 +31,6 @@ jobs:
     - name: Build with Gradle Wrapper
       run: ./gradlew ${{ secrets.DOCKER_IMAGE_API }}:build
 
-  docker:
-    needs: jar-build
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
     # 3. docker Image 메타데이터 생성 및 관리
     - name: Docker Meta
       id: docker_meta
@@ -59,7 +54,7 @@ jobs:
     - name: Docker Build and Dockerhub Push
       uses: docker/build-push-action@v4
       with:
-        context: ./omaju-app-api
+        context: .
         file: ./omaju-app-api/Dockerfile
         platforms: |
           linux/amd64
@@ -70,7 +65,7 @@ jobs:
           ${{ steps.docker_meta.outputs.labels }}
 
   deploy:
-    needs: docker
+    needs: jar-build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

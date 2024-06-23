@@ -1,3 +1,6 @@
+FROM docker
+COPY --from=docker/buildx-bin:latest /buildx /usr/libexec/docker/cli-plugins/docker-buildx
+
 # 서버를 구동시킬 자바를 받아옵니다.
 FROM azul/zulu-openjdk:17-latest as build
 
@@ -11,4 +14,4 @@ ADD ${JAR_FILE} app.jar
 EXPOSE 8080
 
 # app.jar 파일을 실행합니다.
-ENTRYPOINT ["java","-Duser.timezone=Asia/Seoul", "-jar","/app.jar"]
+ENTRYPOINT ["java", "-Duser.timezone=Asia/Seoul", "-jar", "/app.jar"]

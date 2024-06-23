@@ -54,8 +54,8 @@ jobs:
     - name: Docker Build and Dockerhub Push
       uses: docker/build-push-action@v4
       with:
-        context: .
-        file: ./omaju-app-api/Dockerfile
+        context: ./omaju-app-api
+        # file: ./omaju-app-api/Dockerfile
         platforms: |
           linux/amd64
           linux/arm64/v8

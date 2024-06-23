@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 jobs:
-  build:
+  jar-build:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -29,21 +29,60 @@ jobs:
       run: chmod +x ./gradlew
 
     - name: Build with Gradle Wrapper
-      run: ./gradlew omaju-app-api:build
+      run: ./gradlew ${{ secrets.DOCKER_IMAGE_API }}:build
 
-    # 3. Docker 이미지 빌드
-    - name: docker image build
-      run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/omaju-app-api:latest .
-      working-directory: ./omaju-app-api
+  docker:
+    needs: jar-build
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    # 3. docker Image 메타데이터 생성 및 관리
+    - name: Docker Meta
+      id: docker_meta
+      uses: crazy-max/ghaction-docker-meta@v1
+      with:
+        images: ${{ secrets.DOCKER_IMAGE_API }}
+        tag-custom: latest, ${{ github.run_number }}
 
     # 4. DockerHub 로그인
-    - name: dockerhub login
-      uses: docker/login-action@v2
+    - name: Dockerhub login
+      uses: docker/login-action@v3
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-    # 5. Dockerhub 이미지 푸시
-    - name: dockerhub push
-      run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/omaju-app-api:latest
-      working-directory: ./omaju-app-api
+    # 5. Docker 이미지 빌드 및 Dockerhub 이미지 푸시
+    - name: Docker Build and Dockerhub Push
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        file: ./Dockerfile
+        platforms: |
+          linux/amd64
+          linux/arm64
+          linux/armhf
+          linux/arm/v7
+          linux/s390x
+        push: true
+        tags: ${{ steps.docker_meta.outputs.tags }}
+        label: |
+          ${{ steps.docker_meta.outputs.labels }}
+        working-directory: ./omaju-app-api
+
+  deploy:
+    needs: docker
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # 6. 서버 SSH 접속 후 docker 컨테이너 배포
+      - name: ssh deploy
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME}}
+          key: ${{ secrets.SERVER_KEY }} # ssh pem키 => BEGIN RSA ~ END RSA
+          script: |
+            sudo docker rm -f ${{ secrets.DOCKER_CONTAINER_API }}
+            sudo docker pull ${{ secrets.DOCKER_IMAGE_API }}:latest
+            sudo docker image prune -f
+            sudo docker run --name ${{ secrets.DOCKER_CONTAINER_API }} -p 8000:8080 -d ${{ secrets.DOCKER_IMAGE_API }}:latest

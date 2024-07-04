@@ -1,4 +1,7 @@
 spring:
+  jwt:
+    key: ${JWT_SECRET_KEY} # openssl rand -hex 32
+
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
     url: jdbc:mariadb://omaju-mariadb:3306/coredb

@@ -1,15 +1,20 @@
 package org.duckdns.omaju.api.service.member;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.duckdns.omaju.api.dto.auth.MemberDetails;
 import org.duckdns.omaju.api.service.jwt.JwtService;
 import org.duckdns.omaju.core.entity.member.Member;
 import org.duckdns.omaju.core.repository.MemberRepository;
 import org.duckdns.omaju.core.type.Provider;
 import org.duckdns.omaju.core.util.repository.redis.RedisDao;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
 
+@Slf4j
+@Service
 @RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;

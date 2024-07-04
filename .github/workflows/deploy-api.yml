@@ -79,4 +79,4 @@ jobs:
             sudo docker rm -f ${{ secrets.DOCKER_CONTAINER_API }}
             sudo docker pull ${{ secrets.DOCKER_IMAGE_API }}:latest
             sudo docker image prune -f
-            sudo docker run --name ${{ secrets.DOCKER_CONTAINER_API }} -p 8000:8080 -d ${{ secrets.DOCKER_IMAGE_API }}:latest
+            sudo docker run --name ${{ secrets.DOCKER_CONTAINER_API }} --env-file=~/backup/.env -p 8000:8080 -d ${{ secrets.DOCKER_IMAGE_API }}:latest

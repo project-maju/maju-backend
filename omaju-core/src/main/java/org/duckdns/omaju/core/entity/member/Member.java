@@ -47,12 +47,6 @@ public class Member extends BaseEntity {
     private String fcmToken;
 
     @NotNull
-    private int level = 1;
-
-    @NotNull
-    private int exp = 0;
-
-    @NotNull
     private boolean isLeave = Boolean.FALSE;
 
     @Builder

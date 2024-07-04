@@ -1,73 +1,65 @@
 package org.duckdns.omaju.api.config;
 
+import io.jsonwebtoken.JwtException;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.duckdns.omaju.api.config.jwt.CustomAuthenticationEntryPoint;
+import lombok.extern.slf4j.Slf4j;
+import org.duckdns.omaju.api.dto.auth.Subject;
+import org.duckdns.omaju.api.service.jwt.JwtService;
+import org.duckdns.omaju.api.service.member.MemberService;
 import org.duckdns.omaju.core.util.repository.redis.RedisDao;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.util.ObjectUtils;
+import org.springframework.web.filter.OncePerRequestFilter;
+import java.io.IOException;
+import java.util.Objects;
 
-import java.util.Arrays;
-
-@Configuration
-@EnableWebSecurity
 @RequiredArgsConstructor
-public class AppConfig {
-
-    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+@Slf4j
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final MemberService memberService;
     private final RedisDao redisDao;
 
-    // security 설정 활성화
-    private static final String[] ALLOWED_ENDPOINT = {
-            "/members/kakao-login",
-            "/members/google-login",
-            "/test",
-            "/swagger-ui/**",
-            "/v3/api-docs/swagger-config",
-            "/v3/api-docs",
-            "/h2-console"
-    };
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        String authorization = request.getHeader("Authorization"); // 헤더에서 Authentication 추출
+        if (!Objects.isNull(authorization)) { // 헤더가 존재하는 경우 JWT 토큰 추출
 
-    /** SecurityFilterChain : Spring Security 필터 체인에서 가장 첫 번째 필터
-     * @param http : filterchain을 거치는 요청 http
-     * @return http에 authorizedRequests 설정 추가 후 리런. 특정 url 접근 허용
-     * @throws Exception
-     */
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        // 필터체인 구성
-        http.cors().and().csrf().disable()
-                .exceptionHandling()
-                .authenticationEntryPoint(customAuthenticationEntryPoint)
-                .and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and().authorizeRequests()
-                .requestMatchers(ALLOWED_ENDPOINT).permitAll()
-                .anyRequest().authenticated()
-                .and()
-                .addFilterBefore(new JwtAuthenticationFilter(jwtService, memberService, redisDao),
-                        UsernamePasswordAuthenticationFilter.class);
-        return http.build();
-    }
+            String atk = authorization.substring(7);
+            log.info("authorization : {} - doFilterInternal", authorization);
+            /** 블랙리스트 관리 로직
+             *  1. 리프레시 토큰은 클라이언트에서 항상 reissue API로 요청하기 떄문에 잘돗된 경로 필터링
+             *  2. 로그아웃 시 redis에 로그아웃한 access token을 access token 유효시간 만큼 저장
+             *  3. 로그아웃 후 access token을 삭제하지 않고 재사용 시 블랙리스트 필터링 처리
+             */
+            try {
+                Subject subject = jwtService.extractSubjectFromAtk(atk); // JWT 토큰에서 Subject 객체를 추출
+                String requestURI = request.getRequestURI();
+                // refresh token을 담아서 요청보냈을 때 재발급 url로 접근하지 않는 경우 예외 처리
+                if (subject.getType().equals("RTK") && !requestURI.equals("/api/v1/members/reissue")) {
+                    throw new JwtException("refresh 토큰으로 접근할 수 없는 URI입니다.");
+                }
+                String isLogout = redisDao.getValues(atk);
+                // redis에 토큰이 없는 경우 정상 처리
+                if (ObjectUtils.isEmpty(isLogout)) {
+                    UserDetails userDetails = memberService.loadUserByUsername(subject.getEmail(), subject.getProvider());
+                    Authentication token = new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+                    SecurityContextHolder.getContext().setAuthentication(token);
+                }
+                // redis에 토큰이 있는 경우 블랙리스트 예외 처리
+                else throw new JwtException("유효하지 않은 access 토큰입니다.");
 
-    @Bean
-    CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("*"));
-        configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "PATCH", "DELETE"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-
-        return source;
+            } catch (JwtException e) {
+                request.setAttribute("exception", e.getMessage());
+            }
+        }
+        filterChain.doFilter(request, response);
     }
 }

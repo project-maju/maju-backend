@@ -6,7 +6,7 @@ import io.jsonwebtoken.*;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.duckdns.omaju.api.dto.auth.LoginResponseDTO;
+import org.duckdns.omaju.api.dto.response.login.LoginResponseDTO;
 import org.duckdns.omaju.api.dto.auth.Subject;
 import org.duckdns.omaju.api.dto.response.DataResponseDTO;
 import org.duckdns.omaju.core.entity.member.Member;

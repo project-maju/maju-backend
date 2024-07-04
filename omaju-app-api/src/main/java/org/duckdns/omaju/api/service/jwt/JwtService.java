@@ -1,9 +1,9 @@
 package org.duckdns.omaju.api.service.jwt;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.duckdns.omaju.api.dto.auth.LoginResponseDTO;
 import org.duckdns.omaju.api.dto.auth.Subject;
 import org.duckdns.omaju.api.dto.response.DataResponseDTO;
+import org.duckdns.omaju.api.dto.response.login.LoginResponseDTO;
 import org.duckdns.omaju.core.entity.member.Member;
 
 public interface JwtService {

@@ -43,7 +43,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 Subject subject = jwtService.extractSubjectFromAtk(atk); // JWT 토큰에서 Subject 객체를 추출
                 String requestURI = request.getRequestURI();
                 // refresh token을 담아서 요청보냈을 때 재발급 url로 접근하지 않는 경우 예외 처리
-                if (subject.getType().equals("RTK") && !requestURI.equals("/api/v1/members/reissue")) {
+                if (subject.getType().equals("RTK") && !requestURI.equals("/api/v1/member/reissue")) {
                     throw new JwtException("refresh 토큰으로 접근할 수 없는 URI입니다.");
                 }
                 String isLogout = redisDao.getValues(atk);

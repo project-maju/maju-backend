@@ -30,8 +30,7 @@ public class AppConfig {
 
     // security 설정 활성화
     private static final String[] ALLOWED_ENDPOINT = {
-            "/members/kakao-login",
-            "/members/google-login",
+            "/member/kakao-login",
             "/test",
             "/swagger-ui/**",
             "/v3/api-docs/swagger-config",

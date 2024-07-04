@@ -5,6 +5,9 @@ spring:
     open-in-view: false # Lazy loading을 사용하기 위해 Session을 Controller까지 유지하는 옵션
     hibernate:
       ddl-auto: update
+      naming:
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
+        physical-strategy: com.d208.cs.common.config.CamelCaseToSnakeAndUpperCaseStrategy
     properties:
       hibernate:
         format_sql: true #To beautify or pretty print the SQL

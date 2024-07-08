@@ -9,6 +9,7 @@ import org.duckdns.omaju.api.dto.auth.MemberDetails;
 import org.duckdns.omaju.api.dto.auth.UserDetailsImpl;
 import org.duckdns.omaju.api.dto.auth.UserInfoDTO;
 import org.duckdns.omaju.api.dto.request.login.LoginRequestDTO;
+import org.duckdns.omaju.api.dto.request.logout.LogoutRequestDTO;
 import org.duckdns.omaju.api.dto.response.DataResponseDTO;
 import org.duckdns.omaju.api.dto.response.login.LoginResponseDTO;
 import org.duckdns.omaju.api.service.jwt.JwtService;
@@ -138,8 +139,7 @@ public class MemberServiceImpl implements MemberService {
      * @param memberInfo : 카카오로부터 받은 user info
      * @return Map<String, Object> : member 정보와 기존에 존재하던 사용자인지 아닌지 여부 정보
      */
-    private Map<String, Object> signUpMemberIfNeed(UserInfoDTO memberInfo, LoginRequestDTO loginRequestDTO)
-    {
+    private Map<String, Object> signUpMemberIfNeed(UserInfoDTO memberInfo, LoginRequestDTO loginRequestDTO) {
         Map<String, Object> resMap = new HashMap<>();
         boolean isExist = true;
         Member member = memberRepository.findByEmailAndProvider(memberInfo.getEmail(), memberInfo.getProvider())
@@ -175,8 +175,7 @@ public class MemberServiceImpl implements MemberService {
      * @param member : 회원가입처리가 된 사용자 정보
      * @return authentication : 로그인 인증서
      */
-    private Authentication forceLogin(Member member)
-    {
+    private Authentication forceLogin(Member member) {
         UserDetails userDetails = new UserDetailsImpl(member);
         Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -188,8 +187,7 @@ public class MemberServiceImpl implements MemberService {
      * @param isExist : 기존 사용자 or 신규 사용자 구분 여부
      * @return TokenResDto :
      */
-    private LoginResponseDTO memberAuthenticationInput(Authentication authentication, Boolean isExist) throws JsonProcessingException
-    {
+    private LoginResponseDTO memberAuthenticationInput(Authentication authentication, Boolean isExist) throws JsonProcessingException {
         // response header token 추가
         UserDetailsImpl userDetailsImpl = ((UserDetailsImpl) authentication.getPrincipal());
         String email = userDetailsImpl.getEmail();
@@ -228,5 +226,16 @@ public class MemberServiceImpl implements MemberService {
         Member member = memberRepository.findByEmailAndProvider(email, provider).orElseThrow
                 (() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
         return new MemberDetails(member);
+    }
+
+    @Override
+    public DataResponseDTO<?> logout(Member member, LogoutRequestDTO logoutReqDto) {
+        setBlackList(member, logoutReqDto.getAccessToken());
+        return DataResponseDTO.builder()
+                .message("로그아웃되었습니다.")
+                .data(true)
+                .statusName(HttpStatus.OK.name())
+                .status(HttpStatus.OK.value())
+                .build();
     }
 }

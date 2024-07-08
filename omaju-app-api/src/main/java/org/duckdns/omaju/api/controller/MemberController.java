@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,5 +50,13 @@ public class MemberController {
             @RequestBody LogoutRequestDTO logoutRequestDTO
     )  {
         return memberService.logout(memberDetails.getMember(), logoutRequestDTO);
+    }
+
+    @Operation(description = "회원 탈퇴")
+    @DeleteMapping("/withdrawal")
+    public DataResponseDTO<?> withdrawal(HttpServletRequest httpServletRequest, @AuthenticationPrincipal MemberDetails memberDetails) {
+        String accessToken = httpServletRequest.getHeader("Authorization");
+        log.info("accessToken : {}", accessToken);
+        return memberService.withdrawal(memberDetails.getMember(), accessToken);
     }
 }

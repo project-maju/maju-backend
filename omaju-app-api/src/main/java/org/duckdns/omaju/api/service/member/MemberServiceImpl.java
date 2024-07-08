@@ -12,6 +12,7 @@ import org.duckdns.omaju.api.dto.request.login.LoginRequestDTO;
 import org.duckdns.omaju.api.dto.request.logout.LogoutRequestDTO;
 import org.duckdns.omaju.api.dto.response.DataResponseDTO;
 import org.duckdns.omaju.api.dto.response.login.LoginResponseDTO;
+import org.duckdns.omaju.api.dto.response.member.WithdrawalStatus;
 import org.duckdns.omaju.api.service.jwt.JwtService;
 import org.duckdns.omaju.core.entity.member.Member;
 import org.duckdns.omaju.core.repository.MemberRepository;
@@ -234,6 +235,34 @@ public class MemberServiceImpl implements MemberService {
         return DataResponseDTO.builder()
                 .message("로그아웃되었습니다.")
                 .data(true)
+                .statusName(HttpStatus.OK.name())
+                .status(HttpStatus.OK.value())
+                .build();
+    }
+
+    @Override
+    public DataResponseDTO<?> withdrawal(Member member, String accessToken) {
+        WithdrawalStatus withdrawalStatus = WithdrawalStatus.FAIL;
+
+        if (member.isLeave()) {
+            return DataResponseDTO.builder()
+                    .data(withdrawalStatus.ordinal())
+                    .message("이미 탈퇴한 회원입니다.")
+                    .statusName(HttpStatus.OK.name())
+                    .status(HttpStatus.OK.value())
+                    .build();
+        }
+
+        if (member.getProvider() == Provider.KAKAO)
+            withdrawalStatus = WithdrawalStatus.KAKAO;
+
+        setBlackList(member, accessToken);
+        member.setLeave(true);
+        memberRepository.save(member);
+
+        return DataResponseDTO.builder()
+                .data(withdrawalStatus.ordinal())
+                .message("정상적으로 탈퇴되었습니다.")
                 .statusName(HttpStatus.OK.name())
                 .status(HttpStatus.OK.value())
                 .build();

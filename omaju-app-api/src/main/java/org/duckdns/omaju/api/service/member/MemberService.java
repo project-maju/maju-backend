@@ -15,5 +15,6 @@ import java.security.GeneralSecurityException;
 public interface MemberService {
     DataResponseDTO<?> kakaoLogin(LoginRequestDTO loginRequestDTO) throws GeneralSecurityException, IOException, JsonProcessingException;
     UserDetails loadUserByUsername(String email, Provider provider) throws UsernameNotFoundException;
-    public DataResponseDTO<?> logout(Member member, LogoutRequestDTO logoutReqDto);
+    DataResponseDTO<?> logout(Member member, LogoutRequestDTO logoutReqDto);
+    DataResponseDTO<?> withdrawal(Member member, String accessToken);
 }

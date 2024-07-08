@@ -76,7 +76,7 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME}}
           key: ${{ secrets.SERVER_KEY }} # ssh pem키 => BEGIN RSA ~ END RSA
           script: |
-            sudo docker rm -f ${{ secrets.DOCKER_CONTAINER_API }}
-            sudo docker pull ${{ secrets.DOCKER_IMAGE_API }}:latest
-            sudo docker image prune -f
-            sudo docker run --name ${{ secrets.DOCKER_CONTAINER_API }} --env-file=~/backup/.env -p 8000:8080 -d ${{ secrets.DOCKER_IMAGE_API }}:latest
+            docker rm -f ${{ secrets.DOCKER_CONTAINER_API }}
+            docker pull ${{ secrets.DOCKER_IMAGE_API }}:latest
+            docker image prune -f
+            docker run --name ${{ secrets.DOCKER_CONTAINER_API }} --env-file=$HOME/backup/.env --network omaju -p 8000:8080 -d ${{ secrets.DOCKER_IMAGE_API }}:latest

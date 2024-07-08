@@ -1,4 +1,4 @@
-package org.duckdns.omaju.api.dto.request.login;
+package org.duckdns.omaju.api.dto.request.logout;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
@@ -9,8 +9,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class LogoutRequestDTO {
-
-
     @Schema(description = "access_token")
     private String accessToken;
 

@@ -7,7 +7,6 @@ import lombok.*;
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class LoginRequestDTO {
-
     @NotNull
     private String accessToken;
 

@@ -43,6 +43,19 @@ public class MemberController {
         return memberService.kakaoLogin(loginRequestDTO);
     }
 
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "정상적으로 Access Token을 재발급했을 경우"),
+            @ApiResponse(responseCode = "401", description = "Refresh Token이 만료됐을 경우"),
+            @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰으로 요청할 경우 (responseBody에서 분기 처리되지 않습니다)")
+    })
+    @Operation(summary = "Access Token 재발급", description = "멤버의 액세스 토큰을 재발급합니다")
+    @GetMapping("/reissue")
+    public DataResponseDTO<?> reissue(
+            @AuthenticationPrincipal MemberDetails memberDetails
+    ) throws JsonProcessingException {
+        return jwtService.reissueAtk(memberDetails.getMember());
+    }
+
     @Operation(summary = "로그아웃", description = "로그아웃")
     @PostMapping("/logout")
     public DataResponseDTO<?> logout(
@@ -52,7 +65,7 @@ public class MemberController {
         return memberService.logout(memberDetails.getMember(), logoutRequestDTO);
     }
 
-    @Operation(description = "회원 탈퇴")
+    @Operation(summary = "회원 탈퇴", description = "회원 탈퇴")
     @DeleteMapping("/withdrawal")
     public DataResponseDTO<?> withdrawal(HttpServletRequest httpServletRequest, @AuthenticationPrincipal MemberDetails memberDetails) {
         String accessToken = httpServletRequest.getHeader("Authorization");

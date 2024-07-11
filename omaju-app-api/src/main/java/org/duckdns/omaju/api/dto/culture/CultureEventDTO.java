@@ -15,6 +15,8 @@ public class CultureEventDTO {
 
     private Integer id;
 
+    private String genre;
+
     private String category;
 
     private String eventName;
@@ -38,6 +40,7 @@ public class CultureEventDTO {
     @Builder
     public CultureEventDTO(CultureEvent cultureEvent) {
         this.id = cultureEvent.getId();
+        this.genre = cultureEvent.getGenre();
         this.category = cultureEvent.getCategory();
         this.eventName = cultureEvent.getEventName();
         this.place = cultureEvent.getPlace();

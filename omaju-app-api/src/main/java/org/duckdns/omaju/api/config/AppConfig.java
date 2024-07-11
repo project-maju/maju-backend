@@ -36,7 +36,7 @@ public class AppConfig {
             "/v3/api-docs/swagger-config",
             "/v3/api-docs",
             "/h2-console",
-            "/culture-events"
+            "/culture-events/**"
     };
 
     /** SecurityFilterChain : Spring Security 필터 체인에서 가장 첫 번째 필터

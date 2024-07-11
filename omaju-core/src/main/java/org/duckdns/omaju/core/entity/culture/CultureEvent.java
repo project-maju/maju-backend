@@ -25,15 +25,19 @@ public class CultureEvent extends BaseEntity {
     private Integer id;
 
     @NotNull
+    @Column(nullable = false)
+    private String genre;
+
+    @NotNull
     @Column(length = 50, nullable = false)
     private String category;
 
     @NotNull
-    @Column(name = "name", length = 255, nullable = false)
+    @Column(name = "name", nullable = false)
     private String eventName;
 
     @NotNull
-    @Column(length = 255, nullable = false)
+    @Column(nullable = false)
     private String place;
 
     @NotNull
@@ -63,9 +67,10 @@ public class CultureEvent extends BaseEntity {
     private BigDecimal lon;
 
     @Builder
-    public CultureEvent(Integer id, String category, String eventName, String place, String price, String url,
+    public CultureEvent(Integer id, String genre, String category, String eventName, String place, String price, String url,
                         String thumbnail, LocalDate startDate, LocalDate endDate, BigDecimal lat, BigDecimal lon) {
         this.id = id;
+        this.genre = genre;
         this.category = category;
         this.eventName = eventName;
         this.place = place;

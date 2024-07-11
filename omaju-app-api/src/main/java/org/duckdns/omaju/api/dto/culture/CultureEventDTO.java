@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CultureEventDTO {
 
-    private Integer id;
+    private int id;
 
     private String genre;
 
@@ -38,18 +38,35 @@ public class CultureEventDTO {
     private BigDecimal lon;
 
     @Builder
-    public CultureEventDTO(CultureEvent cultureEvent) {
-        this.id = cultureEvent.getId();
-        this.genre = cultureEvent.getGenre();
-        this.category = cultureEvent.getCategory();
-        this.eventName = cultureEvent.getEventName();
-        this.place = cultureEvent.getPlace();
-        this.price = cultureEvent.getPrice();
-        this.url = cultureEvent.getPrice();
-        this.thumbnail = cultureEvent.getThumbnail();
-        this.startDate = cultureEvent.getStartDate();
-        this.endDate = cultureEvent.getEndDate();
-        this.lat = cultureEvent.getLat();
-        this.lon = cultureEvent.getLon();
+    public CultureEventDTO(Integer id, String genre, String category, String eventName, String place,
+                           String price, String url, String thumbnail, LocalDate startDate,
+                           LocalDate endDate, BigDecimal lat, BigDecimal lon) {
+        this.id = id;
+        this.genre = genre;
+        this.category = category;
+        this.eventName = eventName;
+        this.place = place;
+        this.price = price;
+        this.url = url;
+        this.thumbnail = thumbnail;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.lat = lat;
+        this.lon = lon;
+    }
+
+    public CultureEventDTO(CultureEvent event) {
+        this.id = event.getId();
+        this.genre = event.getGenre();
+        this.category = event.getCategory();
+        this.eventName = event.getEventName();
+        this.place = event.getPlace();
+        this.price = event.getPrice();
+        this.url = event.getUrl();
+        this.thumbnail = event.getThumbnail();
+        this.startDate = event.getStartDate();
+        this.endDate = event.getEndDate();
+        this.lat = event.getLat();
+        this.lon = event.getLon();
     }
 }

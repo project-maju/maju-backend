@@ -22,7 +22,7 @@ public class CultureEvent extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private int id;
 
     @NotNull
     @Column(nullable = false)
@@ -67,7 +67,7 @@ public class CultureEvent extends BaseEntity {
     private BigDecimal lon;
 
     @Builder
-    public CultureEvent(Integer id, String genre, String category, String eventName, String place, String price, String url,
+    public CultureEvent(int id, String genre, String category, String eventName, String place, String price, String url,
                         String thumbnail, LocalDate startDate, LocalDate endDate, BigDecimal lat, BigDecimal lon) {
         this.id = id;
         this.genre = genre;

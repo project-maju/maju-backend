@@ -6,9 +6,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.duckdns.omaju.api.dto.culture.CultureEventDTO;
 import org.duckdns.omaju.api.dto.response.DataResponseDTO;
 import org.duckdns.omaju.api.service.culture.CultureService;
-import org.duckdns.omaju.core.entity.culture.CultureEvent;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,7 +31,7 @@ public class CultureController {
     })
     @Operation(summary = "모든 문화행사 조회", description = "저장된 모든 문화행사 데이터를 조회합니다.")
     @GetMapping("/list")
-    public DataResponseDTO<List<CultureEvent>> getCultureEvents() {
+    public DataResponseDTO<List<CultureEventDTO>> getCultureEvents() {
         return cultureService.getCultureEvents();
     }
 
@@ -41,7 +41,7 @@ public class CultureController {
     })
     @Operation(summary = "특정 문화행사 디테일 조회", description = "eventId로 특정 문화행사 디테일을 조회합니다.")
     @GetMapping("/detail/{eventId}")
-    public DataResponseDTO<CultureEvent> getCultureEventDetail(@PathVariable int eventId) {
+    public DataResponseDTO<CultureEventDTO> getCultureEventDetail(@PathVariable int eventId) {
         return cultureService.getCultureEventDetail(eventId);
     }
 
@@ -51,7 +51,7 @@ public class CultureController {
     })
     @Operation(summary = "특정 장르 문화행사 조회", description = "장르에 따른 문화행사 데이터를 조회합니다.")
     @GetMapping("/list/{genre}")
-    public DataResponseDTO<List<CultureEvent>> getCultureEventsByGenre(@PathVariable String genre) {
+    public DataResponseDTO<List<CultureEventDTO>> getCultureEventsByGenre(@PathVariable String genre) {
         return cultureService.getCultureEventsByGenre(genre);
     }
 }

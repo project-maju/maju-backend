@@ -15,6 +15,6 @@ public interface WalkingTrailsRepository extends JpaRepository<WalkingTrails, In
     @Query(value = "SELECT * FROM walking_trails WHERE `level` = '보통' ORDER BY RAND() LIMIT 1", nativeQuery = true)
     Optional<WalkingTrails> findRandomTrailByNormalLevel();
 
-    @Query(value = "SELECT * FROM walking_trails WHERE `level` IN ('쉬움', '매우어려움') ORDER BY RAND() LIMIT 1", nativeQuery = true)
+    @Query(value = "SELECT * FROM walking_trails WHERE `level` IN ('어려움', '매우어려움') ORDER BY RAND() LIMIT 1", nativeQuery = true)
     Optional<WalkingTrails> findRandomTrailByHardLevel();
 }

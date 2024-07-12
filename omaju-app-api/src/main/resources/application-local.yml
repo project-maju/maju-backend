@@ -10,3 +10,6 @@ spring:
       host: localhost
       port: 6379
       password: serim0503!
+
+weather:
+  key: ${OPENWEATHER_API_KEY}

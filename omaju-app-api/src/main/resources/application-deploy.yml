@@ -13,3 +13,6 @@ spring:
       host: omaju-redisdb
       port: 6379
       password: ${REDISDB_PASSWORD}
+
+weather:
+  key: ${OPENWEATHER_API_KEY}

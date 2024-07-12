@@ -23,9 +23,16 @@ public class WalkingTrails {
     @Column(length = 10)
     private String level;
 
+    @NotNull
     private double startLat;
+
+    @NotNull
     private double startLon;
+
+    @NotNull
     private double endLat;
+
+    @NotNull
     private double endLon;
 
     @Builder

@@ -27,40 +27,18 @@ public class CultureLikeController {
 
     private final CultureLikeService cultureLikeService;
 
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "북마크를 성공한 경우"),
-            @ApiResponse(responseCode = "400", description = "입력데이터 부적합"),
-            @ApiResponse(responseCode = "401", description = "accessToken 부적합")
-    })
+    @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "북마크를 성공한 경우"), @ApiResponse(responseCode = "400", description = "입력데이터 부적합"), @ApiResponse(responseCode = "401", description = "accessToken 부적합")})
     @Operation(summary = "문화생활 북마크", description = "eventId로 문화생활 글을 북마크합니다.")
     @PostMapping
-    public DataResponseDTO<Void> addFavorite(@AuthenticationPrincipal MemberDetails memberDetails, @RequestParam int cultureEventId) {
-        cultureLikeService.addCultureLike(memberDetails.getMember().getId(), cultureEventId);
-        return new DataResponseDTO<>(HttpStatus.CREATED.value(), HttpStatus.CREATED.name(), "북마크 추가 완료", null);
+    public DataResponseDTO<Void> reverseCultureLike(@AuthenticationPrincipal MemberDetails memberDetails, @RequestParam int cultureEventId) {
+        Boolean isLiked = cultureLikeService.reverseCultureLike(memberDetails.getMember().getId(), cultureEventId);
+        return new DataResponseDTO<>(HttpStatus.CREATED.value(), HttpStatus.CREATED.name(), isLiked.toString(), null);
     }
 
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "202", description = "북마크 삭제를 성공한 경우"),
-            @ApiResponse(responseCode = "400", description = "입력데이터 부적합"),
-            @ApiResponse(responseCode = "401", description = "accessToken 부적합")
-    })
-    @Operation(summary = "문화생활 북마크 삭제", description = "eventId로 문화생활 글 북마크를 취소합니다.")
-    @DeleteMapping("/{cultureEventId}")
-    public DataResponseDTO<Void> removeFavorite(@AuthenticationPrincipal MemberDetails memberDetails, @PathVariable int cultureEventId) {
-        cultureLikeService.removeCultureLike(memberDetails.getMember().getId(), cultureEventId);
-        return new DataResponseDTO<>(HttpStatus.ACCEPTED.value(), HttpStatus.ACCEPTED.name(), "북마크 삭제 완료", null);
-    }
-
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "조회 성공"),
-            @ApiResponse(responseCode = "400", description = "입력 데이터 부적합"),
-            @ApiResponse(responseCode = "401", description = "인증 실패")
-    })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "조회 성공"), @ApiResponse(responseCode = "400", description = "입력 데이터 부적합"), @ApiResponse(responseCode = "401", description = "인증 실패")})
     @Operation(summary = "특정 날짜에 포함된 북마크된 문화생활 조회", description = "특정 날짜가 시작일과 종료일 사이에 포함된 북마크된 문화생활 게시글들을 조회합니다.")
     @GetMapping("/{date}")
-    public DataResponseDTO<List<CultureEventDTO>> getCultureEventsByDate(
-            @AuthenticationPrincipal MemberDetails memberDetails,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+    public DataResponseDTO<List<CultureEventDTO>> getCultureEventsByDate(@AuthenticationPrincipal MemberDetails memberDetails, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         return cultureLikeService.getCultureLikesByDate(memberDetails.getMember().getId(), date);
     }
 }

@@ -27,8 +27,7 @@ public class CultureLike extends BaseEntity {
     private CultureEvent cultureEvent;
 
     @Builder
-    public CultureLike(int id, Member member, CultureEvent cultureEvent) {
-        this.id = id;
+    public CultureLike(Member member, CultureEvent cultureEvent) {
         this.member = member;
         this.cultureEvent = cultureEvent;
     }

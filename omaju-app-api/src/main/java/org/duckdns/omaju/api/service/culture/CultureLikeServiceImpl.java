@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -26,23 +27,21 @@ public class CultureLikeServiceImpl implements CultureLikeService {
     private final CultureRepository cultureRepository;
 
     @Override
-    public void addCultureLike(int memberId, int cultureEventId) {
+    public Boolean reverseCultureLike(int memberId, int cultureEventId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("회원 정보를 찾을 수 없습니다: " + memberId));
         CultureEvent cultureEvent = cultureRepository.findById(cultureEventId)
                 .orElseThrow(() -> new RuntimeException("문화 행사를 찾을 수 없습니다: " + cultureEventId));
 
-        CultureLike favorite = CultureLike.builder()
-                .member(member)
-                .cultureEvent(cultureEvent)
-                .build();
+        Optional<CultureLike> cl = cultureLikeRepository.findByMemberIdAndCultureEventId(member.getId(), cultureEvent.getId());
 
-        cultureLikeRepository.save(favorite);
-    }
-
-    @Override
-    public void removeCultureLike(int memberId, int cultureEventId) {
-        cultureLikeRepository.deleteByMemberIdAndCultureEventId(memberId, cultureEventId);
+        if (cl.isPresent()) {
+            cultureLikeRepository.delete(cl.get());
+            return false;
+        } else {
+            cultureLikeRepository.save(CultureLike.builder().cultureEvent(cultureEvent).member(member).build());
+            return true;
+        }
     }
 
     @Override

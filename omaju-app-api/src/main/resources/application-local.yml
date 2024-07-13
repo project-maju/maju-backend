@@ -10,3 +10,6 @@ spring:
       host: localhost
       port: 6379
       password: serim0503!
+
+tmap:
+  key: ${TMAP_OPENAPI_KEY}

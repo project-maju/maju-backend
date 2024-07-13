@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.duckdns.omaju.api.dto.auth.MemberDetails;
+import org.duckdns.omaju.api.dto.request.walking.WalkingHistoryRequestDTO;
 import org.duckdns.omaju.api.dto.response.DataResponseDTO;
 import org.duckdns.omaju.api.service.walking.WalkingService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -56,7 +57,8 @@ public class WalkingController {
             @ApiResponse(responseCode = "400", description = "유효하지 않은 access token 값 입력시 오류"),
             @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰으로 요청할 경우(responseBody에서 분기 처리되지 않습니다.)"),
     })
-    public DataResponseDTO<?> historyInsert(@AuthenticationPrincipal MemberDetails memberDetails, double distance, int steps) {
-        return walkingService.historyInsert(memberDetails.getMember(), distance, steps);
+    public DataResponseDTO<?> historyInsert(@AuthenticationPrincipal MemberDetails memberDetails,
+                                            @RequestBody WalkingHistoryRequestDTO walkingHistoryRequestDTO) {
+        return walkingService.historyInsert(memberDetails.getMember(), walkingHistoryRequestDTO.getDistance(), walkingHistoryRequestDTO.getSteps());
     }
 }

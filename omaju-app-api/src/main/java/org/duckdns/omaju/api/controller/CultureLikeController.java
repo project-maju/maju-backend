@@ -16,7 +16,10 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Tag(name = "CultureLike", description = "문화행사 북마크 API")
@@ -37,8 +40,18 @@ public class CultureLikeController {
 
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "조회 성공"), @ApiResponse(responseCode = "400", description = "입력 데이터 부적합"), @ApiResponse(responseCode = "401", description = "인증 실패")})
     @Operation(summary = "특정 날짜에 포함된 북마크된 문화생활 조회", description = "특정 날짜가 시작일과 종료일 사이에 포함된 북마크된 문화생활 게시글들을 조회합니다.")
-    @GetMapping("/{date}")
-    public DataResponseDTO<List<CultureEventDTO>> getCultureEventsByDate(@AuthenticationPrincipal MemberDetails memberDetails, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+    @GetMapping("/date/{date}")
+    public DataResponseDTO<List<CultureEventDTO>> getCultureEventsByDate(
+            @AuthenticationPrincipal MemberDetails memberDetails,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         return cultureLikeService.getCultureLikesByDate(memberDetails.getMember().getId(), date);
+    }
+
+    @GetMapping("/month/{month}")
+    public DataResponseDTO<Map<LocalDate, Boolean>> getFavoritesByMonth(
+            @AuthenticationPrincipal MemberDetails memberDetails,
+            @RequestParam String month) {
+        YearMonth yearMonth = YearMonth.parse(month, DateTimeFormatter.ofPattern("yyyy-MM"));
+        return cultureLikeService.getCultureLikesByMonth(memberDetails.getMember().getId(), yearMonth);
     }
 }

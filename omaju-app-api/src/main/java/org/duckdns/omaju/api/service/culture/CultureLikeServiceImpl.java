@@ -14,7 +14,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -65,6 +68,36 @@ public class CultureLikeServiceImpl implements CultureLikeService {
                 .toList();
         return DataResponseDTO.<List<CultureEventDTO>>builder()
                 .data(eventsDTO)
+                .status(HttpStatus.OK.value())
+                .message("날짜에 따른 문화생활 조회 완료")
+                .statusName(HttpStatus.OK.name())
+                .build();
+    }
+
+    @Override
+    public DataResponseDTO<Map<LocalDate, Boolean>> getCultureLikesByMonth(int memberId, YearMonth yearMonth) {
+        LocalDate startDate = yearMonth.atDay(1);  // 해당 월의 첫째 날
+        LocalDate endDate = yearMonth.atEndOfMonth();  // 해당 월의 마지막 날
+
+        List<CultureEvent> events = cultureLikeRepository.findByMemberIdAndDateRange(memberId, startDate, endDate);
+
+        Map<LocalDate, Boolean> dateMap = new HashMap<>();
+
+        // 해당 월의 모든 날짜를 false로 초기화
+        for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
+            dateMap.put(date, false);
+        }
+
+        // 이벤트가 있는 날짜를 true로 설정
+        for (CultureEvent event : events) {
+            for (LocalDate date = event.getStartDate(); !date.isAfter(event.getEndDate()); date = date.plusDays(1)) {
+                if (dateMap.containsKey(date)) {
+                    dateMap.put(date, true);
+                }
+            }
+        }
+        return DataResponseDTO.<Map<LocalDate, Boolean>>builder()
+                .data(dateMap)
                 .status(HttpStatus.OK.value())
                 .message("날짜에 따른 문화생활 조회 완료")
                 .statusName(HttpStatus.OK.name())

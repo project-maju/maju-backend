@@ -18,4 +18,7 @@ public interface CultureLikeRepository extends JpaRepository<CultureLike, Intege
 
     @Query("SELECT ce FROM CultureLike cl JOIN cl.cultureEvent ce WHERE cl.member.id = :memberId AND :date BETWEEN ce.startDate AND ce.endDate")
     List<CultureEvent> findByMemberIdAndDate(@Param("memberId") int memberId, @Param("date") LocalDate date);
+
+    @Query("SELECT ce FROM CultureLike cl JOIN cl.cultureEvent ce WHERE cl.member.id = :memberId AND ce.startDate <= :endDate AND ce.endDate >= :startDate")
+    List<CultureEvent> findByMemberIdAndDateRange(@Param("memberId") int memberId, @Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 }

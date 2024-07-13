@@ -31,6 +31,18 @@ public class CultureLikeController {
     @PostMapping
     public DataResponseDTO<Void> addFavorite(@AuthenticationPrincipal MemberDetails memberDetails, @RequestParam int cultureEventId) {
         cultureLikeService.addCultureLike(memberDetails.getMember().getId(), cultureEventId);
-        return new DataResponseDTO<>(HttpStatus.CREATED.value(), HttpStatus.CREATED.name(), "즐겨찾기 추가 완료", null);
+        return new DataResponseDTO<>(HttpStatus.CREATED.value(), HttpStatus.CREATED.name(), "북마크 추가 완료", null);
+    }
+
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "202", description = "북마크 삭제를 성공한 경우"),
+            @ApiResponse(responseCode = "400", description = "입력데이터 부적합"),
+            @ApiResponse(responseCode = "401", description = "accessToken 부적합")
+    })
+    @Operation(summary = "문화생활 북마크 삭제", description = "eventId로 문화생활 글 북마크를 취소합니다.")
+    @DeleteMapping("/{cultureEventId}")
+    public DataResponseDTO<Void> removeFavorite(@AuthenticationPrincipal MemberDetails memberDetails, @PathVariable int cultureEventId) {
+        cultureLikeService.removeCultureLike(memberDetails.getMember().getId(), cultureEventId);
+        return new DataResponseDTO<>(HttpStatus.ACCEPTED.value(), HttpStatus.ACCEPTED.name(), "북마크 삭제 완료", null);
     }
 }

@@ -34,10 +34,10 @@ public class CultureLikeServiceImpl implements CultureLikeService {
         cultureLikeRepository.save(favorite);
     }
 
-//    @Override
-//    public void removeCultureLike(int memberId, int cultureEventId) {
-//
-//    }
+    @Override
+    public void removeCultureLike(int memberId, int cultureEventId) {
+        cultureLikeRepository.deleteByMemberIdAndCultureEventId(memberId, cultureEventId);
+    }
 //
 //    @Override
 //    public DataResponseDTO<List<CultureEventDTO>> getCultureLikes(int memberId) {

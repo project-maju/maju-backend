@@ -4,7 +4,7 @@ public interface CultureLikeService {
 
     void addCultureLike(int memberId, int cultureEventId);
 
-//    void removeCultureLike(int memberId, int cultureEventId);
+    void removeCultureLike(int memberId, int cultureEventId);
 //
 //    DataResponseDTO<List<CultureEventDTO>> getCultureLikes(int memberId);
 //

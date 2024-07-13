@@ -13,3 +13,6 @@ spring:
       host: omaju-redisdb
       port: 6379
       password: ${REDISDB_PASSWORD}
+
+tmap:
+  key: ${TMAP_OPENAPI_KEY}

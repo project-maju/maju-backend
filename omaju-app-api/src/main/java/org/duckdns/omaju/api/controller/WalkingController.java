@@ -2,14 +2,15 @@ package org.duckdns.omaju.api.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.duckdns.omaju.api.dto.auth.MemberDetails;
 import org.duckdns.omaju.api.dto.response.DataResponseDTO;
 import org.duckdns.omaju.api.service.walking.WalkingService;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -46,5 +47,16 @@ public class WalkingController {
             ,@Parameter(name = "endLat", description = "종료 위도") @PathVariable double endLat
             ,@Parameter(name = "endLon", description = "종료 경도") @PathVariable double endLon) {
         return walkingService.tmapTrace(startLat, startLon, endLat, endLon);
+    }
+
+    @PostMapping("/history")
+    @Operation(summary = "산책 히스토리 기록", description = "산책 히스토리 기록")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "정상적으로 데이터가 조회되는 경우"),
+            @ApiResponse(responseCode = "400", description = "유효하지 않은 access token 값 입력시 오류"),
+            @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰으로 요청할 경우(responseBody에서 분기 처리되지 않습니다.)"),
+    })
+    public DataResponseDTO<?> historyInsert(@AuthenticationPrincipal MemberDetails memberDetails, double distance, int steps) {
+        return walkingService.historyInsert(memberDetails.getMember(), distance, steps);
     }
 }

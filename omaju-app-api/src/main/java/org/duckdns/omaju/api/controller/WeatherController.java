@@ -27,4 +27,12 @@ public class WeatherController {
             @Parameter(name = "lon", description = "날씨를 조회할 지역의 경도") @PathVariable double lon) {
         return weatherService.currentWeather(lat, lon);
     }
+
+    @GetMapping("/current-address/{lat}/{lon}")
+    @Operation(description = "위도, 경도와 일치하는 지역에 대한 현재 주소정보 조회")
+    public DataResponseDTO<?> currentAddress(
+            @Parameter(name = "lat", description = "주소를 조회할 지역의 위도") @PathVariable double lat,
+            @Parameter(name = "lon", description = "주소를 조회할 지역의 경도") @PathVariable double lon) {
+        return weatherService.currentAddress(lat, lon);
+    }
 }

@@ -21,10 +21,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Slf4j
-@Tag(name = "CulturalEvent", description = "문화행사 관련 API")
+@Tag(name = "CultureEvent", description = "문화행사 관련 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/culture-events")
@@ -82,12 +83,27 @@ public class CultureController {
     })
     @Operation(summary = "페이징한 모든 문화행사 조회", description = "저장된 모든 문화행사 데이터를 조회합니다.")
 
-    @GetMapping("list/paging/{page}/{size}")
-    public DataResponseDTO<List<CultureEventDTO>> getCultureEventPaging(
+    @GetMapping("/list/paging/{page}/{size}")
+    public DataResponseDTO<List<CultureEventDTO>> getCultureEventsPaging(
             @AuthenticationPrincipal MemberDetails memberDetails,
             @Parameter(name = "page", description = "0 이상의 페이지 수") @PathVariable int page,
             @Parameter(name = "size", description = "한 페이지에 할당되는 글 수") @PathVariable int size) {
         Pageable pageable = PageRequest.of(page, size);
         return cultureService.getCultureEventsPaging(pageable, memberDetails.getMember().getId());
+    }
+
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "정상적으로 문화행사를 조회한 경우"),
+            @ApiResponse(responseCode = "404", description = "문화행사를 조회하지 못한 경우")
+    })
+    @Operation(summary = "위경도 범위로 문화행사 조회", description = "화면에 보이는 영역 내의 문화행사 데이터를 조회합니다.")
+    @GetMapping("/list/bounds/{southLat}/{northLat}/{westLon}/{eastLon}")
+    public DataResponseDTO<List<CultureEventDTO>> getCultureEventsWithinBounds(
+            @AuthenticationPrincipal MemberDetails memberDetails,
+            @Parameter(name = "southLat", description = "하단 위도") @PathVariable BigDecimal southLat,
+            @Parameter(name = "northLat", description = "상단 위도") @PathVariable BigDecimal northLat,
+            @Parameter(name = "westLon", description = "좌측 경도") @PathVariable BigDecimal westLon,
+            @Parameter(name = "eastLon", description = "우측 경도") @PathVariable BigDecimal eastLon) {
+        return cultureService.getCultureEventsWithinBounds(southLat, northLat, westLon, eastLon, memberDetails.getMember().getId());
     }
 }

@@ -48,6 +48,8 @@ public class CultureLikeController {
         return cultureLikeService.getCultureLikesByDate(memberDetails.getMember().getId(), date);
     }
 
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "조회 성공"), @ApiResponse(responseCode = "400", description = "입력 데이터 부적합"), @ApiResponse(responseCode = "401", description = "인증 실패")})
+    @Operation(summary = "특정 달에 포함된 북마크된 문화생활 조회", description = "특정 달에 포함된 북마크된 문화생활 게시글들을 조회합니다.")
     @GetMapping("/month/{month}")
     public DataResponseDTO<Map<LocalDate, Boolean>> getFavoritesByMonth(
             @AuthenticationPrincipal MemberDetails memberDetails,

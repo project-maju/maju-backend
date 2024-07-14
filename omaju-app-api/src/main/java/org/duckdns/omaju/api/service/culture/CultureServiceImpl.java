@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -20,6 +22,14 @@ public class CultureServiceImpl implements CultureService {
 
     private final CultureRepository cultureRepository;
     private final CultureLikeRepository cultureLikeRepository;
+    private final Random random = new Random();
+
+    private static final Map<String, String> WEATHER_GENRE_MAP = Map.of(
+            "흐림", "연극",
+            "비", "전시",
+            "눈", "음악",
+            "맑음", "체험"
+    );
 
     @Override
     public DataResponseDTO<List<CultureEventDTO>> getCultureEvents(int memberId) {
@@ -71,6 +81,39 @@ public class CultureServiceImpl implements CultureService {
                 .data(eventDTOs)
                 .status(HttpStatus.OK.value())
                 .message("장르별 문화생활 조회 완료")
+                .statusName(HttpStatus.OK.name())
+                .build();
+    }
+
+    @Override
+    public DataResponseDTO<CultureEventDTO> getCultureEventByWeather(String weather) {
+        String genre = WEATHER_GENRE_MAP.getOrDefault(weather, "체험");
+
+        List<CultureEvent> events = cultureRepository.findByGenre(genre);
+        if (events.isEmpty()) {
+            throw new RuntimeException("해당 장르의 이벤트가 없습니다.");
+        }
+
+        CultureEvent randomEvent = events.get(random.nextInt(events.size()));
+        CultureEventDTO randomEventDTO = CultureEventDTO.builder()
+                .id(randomEvent.getId())
+                .genre(randomEvent.getGenre())
+                .category(randomEvent.getCategory())
+                .eventName(randomEvent.getEventName())
+                .place(randomEvent.getPlace())
+                .price(randomEvent.getPrice())
+                .url(randomEvent.getUrl())
+                .thumbnail(randomEvent.getThumbnail())
+                .startDate(randomEvent.getStartDate())
+                .endDate(randomEvent.getEndDate())
+                .lat(randomEvent.getLat())
+                .lon(randomEvent.getLon())
+                .build();
+
+        return DataResponseDTO.<CultureEventDTO>builder()
+                .data(randomEventDTO)
+                .status(HttpStatus.OK.value())
+                .message("날씨에 따른 문화생활 조회 완료")
                 .statusName(HttpStatus.OK.name())
                 .build();
     }

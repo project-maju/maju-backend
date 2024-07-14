@@ -1,6 +1,7 @@
 package org.duckdns.omaju.api.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -9,7 +10,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.duckdns.omaju.api.dto.auth.MemberDetails;
 import org.duckdns.omaju.api.dto.culture.CultureEventDTO;
 import org.duckdns.omaju.api.dto.response.DataResponseDTO;
+import org.duckdns.omaju.api.dto.weather.WeatherResponseDTO;
 import org.duckdns.omaju.api.service.culture.CultureService;
+import org.duckdns.omaju.api.service.weather.WeatherService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,6 +29,7 @@ import java.util.List;
 public class CultureController {
 
     private final CultureService cultureService;
+    private final WeatherService weatherService;
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "정상적으로 문화행사를 조회한 경우"),
@@ -55,5 +59,18 @@ public class CultureController {
     @GetMapping("/list/{genre}")
     public DataResponseDTO<List<CultureEventDTO>> getCultureEventsByGenre(@PathVariable String genre, @AuthenticationPrincipal MemberDetails memberDetails) {
         return cultureService.getCultureEventsByGenre(genre, memberDetails.getMember().getId());
+    }
+
+    @GetMapping("/home-recommendation/{lat}/{lon}")
+    @Operation(summary = "날씨에 따른 문화행사 추천", description = "날씨에 따른 문화행사 데이터를 한 가지 추천합니다.")
+    public DataResponseDTO<CultureEventDTO> getCultureEventByWeather(
+            @Parameter(name = "lat", description = "주소를 조회할 지역의 위도") @PathVariable double lat,
+            @Parameter(name = "lon", description = "주소를 조회할 지역의 경도") @PathVariable double lon) {
+        String weather = "맑음";
+        DataResponseDTO<?> response = weatherService.currentWeather(lat, lon);
+        if (response.getData() instanceof WeatherResponseDTO) {
+            weather = ((WeatherResponseDTO) response.getData()).getDescription();
+        }
+        return cultureService.getCultureEventByWeather(weather);
     }
 }

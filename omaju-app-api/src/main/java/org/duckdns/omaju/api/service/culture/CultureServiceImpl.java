@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.duckdns.omaju.api.dto.culture.CultureEventDTO;
 import org.duckdns.omaju.api.dto.response.DataResponseDTO;
 import org.duckdns.omaju.core.entity.culture.CultureEvent;
-import org.duckdns.omaju.core.entity.member.Member;
 import org.duckdns.omaju.core.repository.CultureLikeRepository;
 import org.duckdns.omaju.core.repository.CultureRepository;
 import org.springframework.http.HttpStatus;
@@ -44,27 +43,14 @@ public class CultureServiceImpl implements CultureService {
     }
 
     @Override
-    public DataResponseDTO<CultureEventDTO> getCultureEventDetail(int eventId) {
+    public DataResponseDTO<CultureEventDTO> getCultureEventDetail(int eventId, int memberId) {
         CultureEvent event = cultureRepository.findById(eventId)
                 .orElseThrow(() -> new RuntimeException("문화행사를 찾을 수 없습니다: " + eventId));
-
-        CultureEventDTO eventDTO = CultureEventDTO.builder()
-                .id(event.getId())
-                .genre(event.getGenre())
-                .category(event.getCategory())
-                .eventName(event.getEventName())
-                .place(event.getPlace())
-                .price(event.getPrice())
-                .url(event.getUrl())
-                .thumbnail(event.getThumbnail())
-                .startDate(event.getStartDate())
-                .endDate(event.getEndDate())
-                .lat(event.getLat())
-                .lon(event.getLon())
-                .build();
+        boolean likeStatus = isLikedByMember(event, memberId);
+        CultureEventDTO cultureEventDTO = new CultureEventDTO(event, likeStatus);
 
         return DataResponseDTO.<CultureEventDTO>builder()
-                .data(eventDTO)
+                .data(cultureEventDTO)
                 .status(HttpStatus.OK.value())
                 .message("문화생활 상세 조회 완료")
                 .statusName(HttpStatus.OK.name())

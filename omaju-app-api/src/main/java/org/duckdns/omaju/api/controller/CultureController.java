@@ -10,7 +10,6 @@ import org.duckdns.omaju.api.dto.auth.MemberDetails;
 import org.duckdns.omaju.api.dto.culture.CultureEventDTO;
 import org.duckdns.omaju.api.dto.response.DataResponseDTO;
 import org.duckdns.omaju.api.service.culture.CultureService;
-import org.duckdns.omaju.core.entity.member.Member;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -44,8 +43,8 @@ public class CultureController {
     })
     @Operation(summary = "특정 문화행사 디테일 조회", description = "eventId로 특정 문화행사 디테일을 조회합니다.")
     @GetMapping("/detail/{eventId}")
-    public DataResponseDTO<CultureEventDTO> getCultureEventDetail(@PathVariable int eventId) {
-        return cultureService.getCultureEventDetail(eventId);
+    public DataResponseDTO<CultureEventDTO> getCultureEventDetail(@AuthenticationPrincipal MemberDetails memberDetails, @PathVariable int eventId) {
+        return cultureService.getCultureEventDetail(eventId, memberDetails.getMember().getId());
     }
 
     @ApiResponses(value = {

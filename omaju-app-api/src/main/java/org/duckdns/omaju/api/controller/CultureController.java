@@ -64,8 +64,8 @@ public class CultureController {
     @GetMapping("/home-recommendation/{lat}/{lon}")
     @Operation(summary = "날씨에 따른 문화행사 추천", description = "날씨에 따른 문화행사 데이터를 한 가지 추천합니다.")
     public DataResponseDTO<CultureEventDTO> getCultureEventByWeather(
-            @Parameter(name = "lat", description = "주소를 조회할 지역의 위도") @PathVariable double lat,
-            @Parameter(name = "lon", description = "주소를 조회할 지역의 경도") @PathVariable double lon) {
+            @Parameter(name = "lat", description = "날씨를 조회할 지역의 위도") @PathVariable double lat,
+            @Parameter(name = "lon", description = "날씨를 조회할 지역의 경도") @PathVariable double lon) {
         String weather = "맑음";
         DataResponseDTO<?> response = weatherService.currentWeather(lat, lon);
         if (response.getData() instanceof WeatherResponseDTO) {

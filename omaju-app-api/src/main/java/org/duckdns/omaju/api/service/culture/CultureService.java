@@ -12,4 +12,6 @@ public interface CultureService {
     DataResponseDTO<CultureEventDTO> getCultureEventDetail(int eventId, int memberId);
 
     DataResponseDTO<List<CultureEventDTO>> getCultureEventsByGenre(String genre, int memBerId);
+
+    DataResponseDTO<CultureEventDTO> getCultureEventByWeather(String weather);
 }

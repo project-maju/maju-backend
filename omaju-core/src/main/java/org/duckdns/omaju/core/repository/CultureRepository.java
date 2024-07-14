@@ -16,4 +16,6 @@ public interface CultureRepository extends JpaRepository<CultureEvent, Integer> 
     Optional<CultureEvent> findById(@Param("id") int eventId);
 
     List<CultureEvent> findTop30ByGenreOrderByIdAsc(@Param("genre") String genre);
+
+    List<CultureEvent> findByGenre(String genre);
 }

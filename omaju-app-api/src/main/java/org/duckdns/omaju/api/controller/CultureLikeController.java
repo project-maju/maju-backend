@@ -1,6 +1,7 @@
 package org.duckdns.omaju.api.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -43,14 +44,14 @@ public class CultureLikeController {
     @GetMapping("/date/{date}")
     public DataResponseDTO<List<CultureEventDTO>> getCultureEventsByDate(
             @AuthenticationPrincipal MemberDetails memberDetails,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+            @Parameter(name = "date", description = "yyyy-MM-dd 형식으로 북마크한 문화생활을 조회하고자 하는 날짜 입력") @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         return cultureLikeService.getCultureLikesByDate(memberDetails.getMember().getId(), date);
     }
 
     @GetMapping("/month/{month}")
     public DataResponseDTO<Map<LocalDate, Boolean>> getFavoritesByMonth(
             @AuthenticationPrincipal MemberDetails memberDetails,
-            @RequestParam String month) {
+            @Parameter(name = "month", description = "yyyy-MM 형식으로 문화생활 북마크 여부를 조회하고자 하는 년/월 입력") @PathVariable String month) {
         YearMonth yearMonth = YearMonth.parse(month, DateTimeFormatter.ofPattern("yyyy-MM"));
         return cultureLikeService.getCultureLikesByMonth(memberDetails.getMember().getId(), yearMonth);
     }

@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -38,7 +39,8 @@ public class CultureServiceImpl implements CultureService {
         List<CultureEventDTO> eventDTOs = events.stream()
                 .map(event -> {
                     boolean likeStatus = isLikedByMember(event, memberId);
-                    return new CultureEventDTO(event, likeStatus);})
+                    return new CultureEventDTO(event, likeStatus);
+                })
                 .collect(Collectors.toList());
 
         return DataResponseDTO.<List<CultureEventDTO>>builder()
@@ -75,7 +77,8 @@ public class CultureServiceImpl implements CultureService {
         List<CultureEventDTO> eventDTOs = events.stream()
                 .map(event -> {
                     boolean likeStatus = isLikedByMember(event, memberId);
-                    return new CultureEventDTO(event, likeStatus);})
+                    return new CultureEventDTO(event, likeStatus);
+                })
                 .collect(Collectors.toList());
 
         return DataResponseDTO.<List<CultureEventDTO>>builder()
@@ -125,13 +128,32 @@ public class CultureServiceImpl implements CultureService {
         List<CultureEventDTO> eventDTOs = events.stream()
                 .map(event -> {
                     boolean likeStatus = isLikedByMember(event, memberId);
-                    return new CultureEventDTO(event, likeStatus);})
+                    return new CultureEventDTO(event, likeStatus);
+                })
                 .collect(Collectors.toList());
 
         return DataResponseDTO.<List<CultureEventDTO>>builder()
                 .data(eventDTOs)
                 .status(HttpStatus.OK.value())
                 .message("문화생활 페이징 전체 조회 완료")
+                .statusName(HttpStatus.OK.name())
+                .build();
+    }
+
+    @Override
+    public DataResponseDTO<List<CultureEventDTO>> getCultureEventsWithinBounds(BigDecimal southLat, BigDecimal northLat, BigDecimal westLon, BigDecimal eastLon, int memberId) {
+        List<CultureEvent> events = cultureRepository.findAllWithinBounds(southLat, northLat, westLon, eastLon);
+        List<CultureEventDTO> eventDTOs = events.stream()
+                .map(event -> {
+                    boolean likeStatus = isLikedByMember(event, memberId);
+                    return new CultureEventDTO(event, likeStatus);
+                })
+                .collect(Collectors.toList());
+
+        return DataResponseDTO.<List<CultureEventDTO>>builder()
+                .data(eventDTOs)
+                .status(HttpStatus.OK.value())
+                .message("문화생활 범위 내 전체 조회 완료")
                 .statusName(HttpStatus.OK.name())
                 .build();
     }

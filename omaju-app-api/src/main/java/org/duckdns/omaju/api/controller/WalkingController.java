@@ -2,6 +2,7 @@ package org.duckdns.omaju.api.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -11,8 +12,14 @@ import org.duckdns.omaju.api.dto.auth.MemberDetails;
 import org.duckdns.omaju.api.dto.request.walking.WalkingHistoryRequestDTO;
 import org.duckdns.omaju.api.dto.response.DataResponseDTO;
 import org.duckdns.omaju.api.service.walking.WalkingService;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.util.Map;
 
 @Slf4j
 @Tag(name = "Walking", description = "산책")
@@ -60,5 +67,38 @@ public class WalkingController {
     public DataResponseDTO<?> historyInsert(@AuthenticationPrincipal MemberDetails memberDetails,
                                             @RequestBody WalkingHistoryRequestDTO walkingHistoryRequestDTO) {
         return walkingService.historyInsert(memberDetails.getMember(), walkingHistoryRequestDTO.getDistance(), walkingHistoryRequestDTO.getSteps());
+    }
+
+    @GetMapping("/history/date/{date}")
+    @Operation(summary = "특정 날짜의 산책 히스토리 조회", description = "특정 날짜에 해당하는 산책 히스토리 조회 (yyyy-MM-dd 형식)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "정상적으로 데이터가 조회되는 경우"),
+            @ApiResponse(responseCode = "400", description = "유효하지 않은 access token 값 입력시 오류"),
+            @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰으로 요청할 경우(responseBody에서 분기 처리되지 않습니다.)"),
+    })
+    @Parameters({
+            @Parameter(name = "month", description = "yyyy-MM-dd 형식으로 산책 히스토리를 조회하고자 하는 날짜 입력")
+    })
+    public DataResponseDTO<?> walkingHistoryByDate(
+            @AuthenticationPrincipal MemberDetails memberDetails,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        return walkingService.walkingHistoryByDate(memberDetails.getMember(), date);
+    }
+
+    @GetMapping("/history/month/{month}")
+    @Operation(summary = "특정 날짜의 산책 히스토리 조회", description = "특정 날짜에 해당하는 산책 히스토리 조회 (yyyy-MM-dd 형식)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "정상적으로 데이터가 조회되는 경우"),
+            @ApiResponse(responseCode = "400", description = "유효하지 않은 access token 값 입력시 오류"),
+            @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰으로 요청할 경우(responseBody에서 분기 처리되지 않습니다.)"),
+    })
+    @Parameters({
+            @Parameter(name = "month", description = "yyyy-MM 형식으로 산책 유무 여부를 조회하고자 하는 년/월 입력")
+    })
+    public DataResponseDTO<?> walkingHistoryByMonth(
+            @AuthenticationPrincipal MemberDetails memberDetails,
+            @RequestParam String month) {
+        YearMonth yearMonth = YearMonth.parse(month, DateTimeFormatter.ofPattern("yyyy-MM"));
+        return walkingService.walkingHistoryByMonth(memberDetails.getMember(), yearMonth);
     }
 }

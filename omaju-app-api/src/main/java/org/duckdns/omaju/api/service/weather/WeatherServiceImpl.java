@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.duckdns.omaju.api.dto.response.DataResponseDTO;
-import org.duckdns.omaju.api.dto.weather.WeatherDTO;
+import org.duckdns.omaju.api.dto.weather.WeatherResponseDTO;
 import org.duckdns.omaju.core.util.HTTPUtils;
 import org.duckdns.omaju.core.util.JSONUtils;
 import org.duckdns.omaju.core.util.network.Get;
@@ -17,18 +17,50 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class WeatherServiceImpl {
+public class WeatherServiceImpl implements WeatherService {
     @Value("${weather.key}")
     private String APP_ID;
 
     public DataResponseDTO<?> currentWeather(double lat, double lon) throws RuntimeException {
         JsonObject weatherData = requestCurrentWeather(lat, lon);
 
-        WeatherDTO weatherDTO = WeatherDTO.builder()
+        String description; // 맑음, 흐림, 비, 눈
+        switch(getIcon(weatherData)) {
+            case "01d":
+            case "01n":
+            case "02d":
+            case "02n":
+                description = "맑음";
+                break;
+            case "03d":
+            case "03n":
+            case "04d":
+            case "04n":
+            case "50d":
+            case "50n":
+                description = "흐림";
+                break;
+            case "09d":
+            case "09n":
+            case "10d":
+            case "10n":
+            case "11d":
+            case "11n":
+                description = "비";
+                break;
+            case "13d":
+            case "13n":
+                description = "눈";
+            default:
+                description = "맑음";
+                break;
+        }
+
+        WeatherResponseDTO weatherDTO = WeatherResponseDTO.builder()
                 .lat(lat)
                 .lon(lon)
                 .temp(getTemp(weatherData))
-                .description(getDescription(weatherData))
+                .description(description)
                 .build();
 
         return DataResponseDTO.builder()
@@ -43,8 +75,8 @@ public class WeatherServiceImpl {
         return ((JsonObject) weatherData.get("main")).get("temp").getAsBigDecimal().doubleValue();
     }
 
-    private String getDescription(JsonObject weatherData) {
-        return ((JsonObject) ((JsonArray) weatherData.get("weather")).get(0)).get("description").toString();
+    private String getIcon(JsonObject weatherData) {
+        return ((JsonObject) ((JsonArray) weatherData.get("weather")).get(0)).get("icon").getAsString();
     }
 
     private JsonObject requestCurrentWeather(double lat, double lng) {

@@ -6,7 +6,7 @@ import lombok.*;
 @ToString
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class WeatherDTO {
+public class WeatherResponseDTO {
     @Schema(description = "위도")
     private double lat;
 
@@ -20,7 +20,7 @@ public class WeatherDTO {
     private String description;
 
     @Builder
-    public WeatherDTO(double lat, double lon, double temp, String description) {
+    public WeatherResponseDTO(double lat, double lon, double temp, String description) {
         this.lat = lat;
         this.lon = lon;
         this.temp = temp;

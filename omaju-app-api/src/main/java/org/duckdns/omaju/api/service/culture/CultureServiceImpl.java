@@ -7,6 +7,7 @@ import org.duckdns.omaju.api.dto.response.DataResponseDTO;
 import org.duckdns.omaju.core.entity.culture.CultureEvent;
 import org.duckdns.omaju.core.repository.CultureLikeRepository;
 import org.duckdns.omaju.core.repository.CultureRepository;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -114,6 +115,23 @@ public class CultureServiceImpl implements CultureService {
                 .data(randomEventDTO)
                 .status(HttpStatus.OK.value())
                 .message("날씨에 따른 문화생활 조회 완료")
+                .statusName(HttpStatus.OK.name())
+                .build();
+    }
+
+    @Override
+    public DataResponseDTO<List<CultureEventDTO>> getCultureEventsPaging(Pageable pageable, int memberId) {
+        List<CultureEvent> events = cultureRepository.findAll(pageable).getContent();
+        List<CultureEventDTO> eventDTOs = events.stream()
+                .map(event -> {
+                    boolean likeStatus = isLikedByMember(event, memberId);
+                    return new CultureEventDTO(event, likeStatus);})
+                .collect(Collectors.toList());
+
+        return DataResponseDTO.<List<CultureEventDTO>>builder()
+                .data(eventDTOs)
+                .status(HttpStatus.OK.value())
+                .message("문화생활 페이징 전체 조회 완료")
                 .statusName(HttpStatus.OK.name())
                 .build();
     }

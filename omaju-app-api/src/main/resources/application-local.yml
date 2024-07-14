@@ -11,5 +11,8 @@ spring:
       port: 6379
       password: serim0503!
 
+weather:
+  key: ${OPENWEATHER_API_KEY}
+
 tmap:
   key: ${TMAP_OPENAPI_KEY}

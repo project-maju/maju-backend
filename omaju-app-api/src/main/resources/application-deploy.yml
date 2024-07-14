@@ -14,5 +14,8 @@ spring:
       port: 6379
       password: ${REDISDB_PASSWORD}
 
+weather:
+  key: ${OPENWEATHER_API_KEY}
+
 tmap:
   key: ${TMAP_OPENAPI_KEY}

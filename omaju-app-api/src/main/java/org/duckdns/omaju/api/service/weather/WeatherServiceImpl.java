@@ -19,7 +19,11 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class WeatherServiceImpl implements WeatherService {
     @Value("${weather.key}")
-    private String APP_ID;
+    private String WEATHER_APP_ID;
+    @Value("${tmap.key}")
+    private String TMAP_API_KEY;
+    private final String VERSION = "1";
+    private final String CALLBACK = "application/json";
 
     public DataResponseDTO<?> currentWeather(double lat, double lon) throws RuntimeException {
         JsonObject weatherData = requestCurrentWeather(lat, lon);
@@ -71,6 +75,21 @@ public class WeatherServiceImpl implements WeatherService {
                 .build();
     }
 
+    @Override
+    public DataResponseDTO<?> currentAddress(double lat, double lon) throws RuntimeException {
+        JsonObject addressData = requestCurrentAddress(lat, lon);
+
+        String cityDo = getCityDo(addressData.get("addressInfo").getAsJsonObject());
+        String guGun = getGuGun(addressData.get("addressInfo").getAsJsonObject());
+
+        return DataResponseDTO.builder()
+                .status(HttpStatus.OK.value())
+                .statusName(HttpStatus.OK.name())
+                .message("주소 데이터를 성공적으로 조회하였습니다.")
+                .data(cityDo + " " + guGun)
+                .build();
+    }
+
     private double getTemp(JsonObject weatherData) {
         return ((JsonObject) weatherData.get("main")).get("temp").getAsBigDecimal().doubleValue();
     }
@@ -79,8 +98,8 @@ public class WeatherServiceImpl implements WeatherService {
         return ((JsonObject) ((JsonArray) weatherData.get("weather")).get(0)).get("icon").getAsString();
     }
 
-    private JsonObject requestCurrentWeather(double lat, double lng) {
-        String url = String.format("https://api.openweathermap.org/data/2.5/weather?lang=kr&units=metric&lat=%f&lon=%f&appid=%s", lat, lng, APP_ID);
+    private JsonObject requestCurrentWeather(double lat, double lon) {
+        String url = String.format("https://api.openweathermap.org/data/2.5/weather?lang=kr&units=metric&lat=%f&lon=%f&appid=%s", lat, lon, WEATHER_APP_ID);
 
         Header header = new Header()
                 .append("User-Agent", HTTPUtils.USER_AGENT)
@@ -105,5 +124,40 @@ public class WeatherServiceImpl implements WeatherService {
             log.error("날씨 조회 중 통신 오류가 발생했습니다.");
             throw new RuntimeException();
         }
+    }
+
+    private JsonObject requestCurrentAddress(double lat, double lon) {
+        String url = String.format("https://apis.openapi.sk.com/tmap/geo/reversegeocoding?lat=%s&lon=%s&version=%s&format=json&callback=%s&appKey=%s", lat, lon, VERSION, CALLBACK, TMAP_API_KEY);
+        System.out.println(url);
+        Header header = new Header()
+                .append("User-Agent", HTTPUtils.USER_AGENT)
+                .append("Accept-Language", HTTPUtils.ACCEPT_LANGUAGE)
+                .append("Connection", HTTPUtils.CONNECTION);
+
+        try {
+            Get get = new Get(url)
+                    .setHeader(header)
+                    .execute();
+
+            int responseCode = get.getResponseCode();
+            if (responseCode != org.apache.http.HttpStatus.SC_OK) {
+                log.debug("responseCode: {}", responseCode);
+                throw new RuntimeException("통신 오류: " + get.getUrl());
+            }
+
+            return JSONUtils.parse(get.getResult());
+        } catch(Exception e) {
+            e.printStackTrace();
+            log.error("주소 조회 중 오류가 발생했습니다.");
+            throw new RuntimeException();
+        }
+    }
+
+    private String getCityDo(JsonObject addressInfo) {
+        return addressInfo.get("city_do").getAsString();
+    }
+
+    private String getGuGun(JsonObject addressInfo) {
+        return addressInfo.get("gu_gun").getAsString();
     }
 }

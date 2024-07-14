@@ -37,10 +37,12 @@ public class CultureEventDTO {
 
     private BigDecimal lon;
 
+    private Boolean likeStatus;
+
     @Builder
     public CultureEventDTO(Integer id, String genre, String category, String eventName, String place,
                            String price, String url, String thumbnail, LocalDate startDate,
-                           LocalDate endDate, BigDecimal lat, BigDecimal lon) {
+                           LocalDate endDate, BigDecimal lat, BigDecimal lon, Boolean likeStatus) {
         this.id = id;
         this.genre = genre;
         this.category = category;
@@ -53,9 +55,10 @@ public class CultureEventDTO {
         this.endDate = endDate;
         this.lat = lat;
         this.lon = lon;
+        this.likeStatus = likeStatus;
     }
 
-    public CultureEventDTO(CultureEvent event) {
+    public CultureEventDTO(CultureEvent event, boolean likeStatus) {
         this.id = event.getId();
         this.genre = event.getGenre();
         this.category = event.getCategory();
@@ -68,5 +71,6 @@ public class CultureEventDTO {
         this.endDate = event.getEndDate();
         this.lat = event.getLat();
         this.lon = event.getLon();
+        this.likeStatus = likeStatus;
     }
 }

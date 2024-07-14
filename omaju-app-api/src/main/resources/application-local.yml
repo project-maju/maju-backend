@@ -13,3 +13,6 @@ spring:
 
 weather:
   key: ${OPENWEATHER_API_KEY}
+
+tmap:
+  key: ${TMAP_OPENAPI_KEY}
